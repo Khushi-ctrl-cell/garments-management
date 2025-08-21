@@ -21,8 +21,8 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Vista Sales Track</h1>
-            <p className="text-muted-foreground">Manage your sales pipeline and tasks efficiently</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">A to Z Garments Track</h1>
+            <p className="text-muted-foreground">Manage your garment orders and tasks efficiently</p>
           </div>
           <Button 
             onClick={() => setShowClientForm(true)}

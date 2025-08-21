@@ -17,11 +17,11 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+              <span className="text-white font-bold text-sm">A</span>
             </div>
             <div className="hidden sm:block">
-              <h2 className="font-semibold text-foreground">Vista Sales</h2>
-              <p className="text-xs text-muted-foreground">Sales Management</p>
+              <h2 className="font-semibold text-foreground">A to Z Garments</h2>
+              <p className="text-xs text-muted-foreground">Garment Management</p>
             </div>
           </div>
 

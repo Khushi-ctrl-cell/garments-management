@@ -4,7 +4,7 @@ import { TrendingUp, DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-
 const stats = [
   {
     title: "Total Sales",
-    value: "$124,750",
+    value: "₹10,37,250",
     change: "+12.5%",
     changeType: "positive" as const,
     icon: DollarSign,
