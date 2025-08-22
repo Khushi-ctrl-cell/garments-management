@@ -4,33 +4,33 @@ import { TrendingUp, DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-
 const stats = [
   {
     title: "Total Sales",
-    value: "₹10,37,250",
-    change: "+12.5%",
-    changeType: "positive" as const,
+    value: "₹0",
+    change: "0%",
+    changeType: "neutral" as const,
     icon: DollarSign,
     color: "success"
   },
   {
     title: "Pending Orders",
-    value: "23",
-    change: "+3",
+    value: "0",
+    change: "0",
     changeType: "neutral" as const,
     icon: Clock,
     color: "warning"
   },
   {
     title: "Completed Tasks",
-    value: "156",
-    change: "+8.2%",
-    changeType: "positive" as const,
+    value: "0",
+    change: "0%",
+    changeType: "neutral" as const,
     icon: CheckCircle,
     color: "success"
   },
   {
     title: "Overdue Items",
-    value: "5",
-    change: "-2",
-    changeType: "negative" as const,
+    value: "0",
+    change: "0",
+    changeType: "neutral" as const,
     icon: AlertCircle,
     color: "destructive"
   }
@@ -52,14 +52,7 @@ export const DashboardStats = () => {
                   <p className="text-2xl font-bold text-foreground">
                     {stat.value}
                   </p>
-                  <p className={`text-xs flex items-center ${
-                    stat.changeType === 'positive' 
-                      ? 'text-success' 
-                      : stat.changeType === 'negative'
-                      ? 'text-destructive'
-                      : 'text-muted-foreground'
-                  }`}>
-                    {stat.changeType === 'positive' && <TrendingUp className="h-3 w-3 mr-1" />}
+                  <p className="text-xs flex items-center text-muted-foreground">
                     {stat.change} from last month
                   </p>
                 </div>

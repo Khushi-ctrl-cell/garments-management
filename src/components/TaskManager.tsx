@@ -33,38 +33,7 @@ interface Task {
   client: string;
 }
 
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    title: "Follow up with Acme Corp",
-    description: "Send proposal for Q2 order",
-    status: "pending",
-    priority: "high",
-    assignee: "John Doe",
-    dueDate: "2024-01-15",
-    client: "Acme Corp"
-  },
-  {
-    id: "2",
-    title: "Process Widget Inc order",
-    description: "Finalize pricing and delivery terms",
-    status: "in-progress",
-    priority: "medium",
-    assignee: "Jane Smith",
-    dueDate: "2024-01-20",
-    client: "Widget Inc"
-  },
-  {
-    id: "3",
-    title: "Update sales forecast",
-    description: "Prepare monthly sales report",
-    status: "completed",
-    priority: "low",
-    assignee: "Mike Johnson",
-    dueDate: "2024-01-10",
-    client: "Internal"
-  }
-];
+const initialTasks: Task[] = [];
 
 interface TaskManagerProps {
   expanded?: boolean;

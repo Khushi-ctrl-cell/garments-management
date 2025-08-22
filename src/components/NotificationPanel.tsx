@@ -19,48 +19,7 @@ interface Notification {
   };
 }
 
-const initialNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "warning",
-    title: "Order Deadline Approaching",
-    message: "Acme Corp order is due in 2 days. Review delivery status.",
-    timestamp: "5 min ago",
-    read: false,
-  },
-  {
-    id: "2",
-    type: "success",
-    title: "Payment Received",
-    message: "Widget Inc has paid $15,750 for order #WI-2024-001.",
-    timestamp: "1 hour ago",
-    read: false,
-  },
-  {
-    id: "3",
-    type: "error",
-    title: "Task Overdue",
-    message: "Follow up call with TechStart is 3 days overdue.",
-    timestamp: "2 hours ago",
-    read: true,
-  },
-  {
-    id: "4",
-    type: "info",
-    title: "New Lead Assignment",
-    message: "You've been assigned a new lead: GlobalTech Solutions.",
-    timestamp: "4 hours ago",
-    read: true,
-  },
-  {
-    id: "5",
-    type: "warning",
-    title: "Inventory Alert",
-    message: "Product XYZ-123 is running low (5 units remaining).",
-    timestamp: "6 hours ago",
-    read: false,
-  },
-];
+const initialNotifications: Notification[] = [];
 
 export const NotificationPanel = () => {
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);

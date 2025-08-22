@@ -1,24 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
 
-const salesData = [
-  { month: 'Jan', sales: 45000, orders: 120, target: 50000 },
-  { month: 'Feb', sales: 52000, orders: 135, target: 50000 },
-  { month: 'Mar', sales: 48000, orders: 128, target: 50000 },
-  { month: 'Apr', sales: 61000, orders: 165, target: 55000 },
-  { month: 'May', sales: 55000, orders: 142, target: 55000 },
-  { month: 'Jun', sales: 67000, orders: 178, target: 60000 },
-];
+const salesData = [];
 
-const weeklyData = [
-  { day: 'Mon', calls: 24, meetings: 8, deals: 3 },
-  { day: 'Tue', calls: 31, meetings: 12, deals: 5 },
-  { day: 'Wed', calls: 28, meetings: 10, deals: 2 },
-  { day: 'Thu', calls: 35, meetings: 15, deals: 7 },
-  { day: 'Fri', calls: 42, meetings: 18, deals: 9 },
-  { day: 'Sat', calls: 18, meetings: 6, deals: 2 },
-  { day: 'Sun', calls: 12, meetings: 3, deals: 1 },
-];
+const weeklyData = [];
 
 interface PerformanceChartProps {
   expanded?: boolean;
