@@ -1,42 +1,53 @@
+import { useTasks, useOrders } from "@/hooks/useDatabase";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total Sales",
-    value: "₹0",
-    change: "0%",
-    changeType: "neutral" as const,
-    icon: DollarSign,
-    color: "success"
-  },
-  {
-    title: "Pending Orders",
-    value: "0",
-    change: "0",
-    changeType: "neutral" as const,
-    icon: Clock,
-    color: "warning"
-  },
-  {
-    title: "Completed Tasks",
-    value: "0",
-    change: "0%",
-    changeType: "neutral" as const,
-    icon: CheckCircle,
-    color: "success"
-  },
-  {
-    title: "Overdue Items",
-    value: "0",
-    change: "0",
-    changeType: "neutral" as const,
-    icon: AlertCircle,
-    color: "destructive"
-  }
-];
-
 export const DashboardStats = () => {
+  const { tasks } = useTasks();
+  const { orders } = useOrders();
+
+  const completedTasks = tasks.filter(task => task.status === 'completed').length;
+  const pendingOrders = orders.filter(order => order.status === 'pending').length;
+  const completedOrders = orders.filter(order => order.status === 'completed').length;
+  const totalRevenue = orders
+    .filter(order => order.status === 'completed')
+    .reduce((sum, order) => sum + (order.total_amount || 0), 0);
+
+  const stats = [
+    {
+      title: "Total Sales",
+      value: `₹${totalRevenue.toLocaleString()}`,
+      change: `${completedOrders} orders`,
+      changeType: "neutral" as const,
+      icon: DollarSign,
+      color: "success"
+    },
+    {
+      title: "Pending Orders",
+      value: pendingOrders.toString(),
+      change: `${orders.length} total`,
+      changeType: "neutral" as const,
+      icon: Clock,
+      color: "warning"
+    },
+    {
+      title: "Completed Tasks",
+      value: completedTasks.toString(),
+      change: `${tasks.length} total tasks`,
+      changeType: "neutral" as const,
+      icon: CheckCircle,
+      color: "success"
+    },
+    {
+      title: "Active Orders",
+      value: orders.length.toString(),
+      change: `${completedOrders} completed`,
+      changeType: "neutral" as const,
+      icon: AlertCircle,
+      color: "destructive"
+    }
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, index) => {
@@ -53,7 +64,7 @@ export const DashboardStats = () => {
                     {stat.value}
                   </p>
                   <p className="text-xs flex items-center text-muted-foreground">
-                    {stat.change} from last month
+                    {stat.change}
                   </p>
                 </div>
                 <div className={`p-3 rounded-lg ${

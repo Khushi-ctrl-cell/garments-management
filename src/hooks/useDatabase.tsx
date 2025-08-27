@@ -1,0 +1,297 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'todo' | 'in_progress' | 'completed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assignee_id?: string;
+  order_id?: string;
+  due_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Order {
+  id: string;
+  order_number: string;
+  description?: string;
+  quantity: number;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  client_id?: string;
+  due_date?: string;
+  total_amount?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export function useTasks() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const fetchTasks = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTasks(data as Task[] || []);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load tasks. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert([{ ...task, user_id: user.id }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setTasks(prev => [data as Task, ...prev]);
+      toast({
+        title: "Task created",
+        description: "Your task has been created successfully.",
+      });
+      return data;
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+      });
+    }
+  };
+
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTasks(prev => prev.map(task => task.id === id ? data as Task : task));
+      return data;
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update task. Please try again.",
+      });
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setTasks(prev => prev.filter(task => task.id !== id));
+      toast({
+        title: "Task deleted",
+        description: "Task has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete task. Please try again.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [user]);
+
+  return {
+    tasks,
+    loading,
+    addTask,
+    updateTask,
+    deleteTask,
+    refetch: fetchTasks,
+  };
+}
+
+export function useOrders() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const fetchOrders = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setOrders(data as Order[] || []);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load orders. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addOrder = async (order: Omit<Order, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([{ ...order, user_id: user.id }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setOrders(prev => [data as Order, ...prev]);
+      toast({
+        title: "Order created",
+        description: "Your order has been created successfully.",
+      });
+      return data;
+    } catch (error) {
+      console.error('Error adding order:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create order. Please try again.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [user]);
+
+  return {
+    orders,
+    loading,
+    addOrder,
+    refetch: fetchOrders,
+  };
+}
+
+export function useClients() {
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const fetchClients = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setClients(data || []);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load clients. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addClient = async (client: Omit<Client, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .insert([{ ...client, user_id: user.id }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setClients(prev => [data, ...prev]);
+      toast({
+        title: "Client added",
+        description: "Client has been added successfully.",
+      });
+      return data;
+    } catch (error) {
+      console.error('Error adding client:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add client. Please try again.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, [user]);
+
+  return {
+    clients,
+    loading,
+    addClient,
+    refetch: fetchClients,
+  };
+}
