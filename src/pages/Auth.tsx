@@ -11,12 +11,13 @@ import { Loader2, Shield, Users, BarChart3 } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, signUp, resetPassword, user, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -32,20 +33,36 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const { error } = await resetPassword(email);
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Reset failed",
+            description: error.message,
+          });
+        } else {
+          toast({
+            title: "Reset email sent!",
+            description: "Check your email for password reset instructions.",
+          });
+          setIsForgotPassword(false);
+          setIsLogin(true);
+        }
+      } else if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
             variant: "destructive",
             title: "Login failed",
-            description: error.message,
+            description: error.message || "Please check your credentials and try again.",
           });
         } else {
           toast({
             title: "Welcome back!",
             description: "You have been successfully logged in.",
           });
-          navigate('/');
+          // Navigation is handled in useAuth hook
         }
       } else {
         const { error } = await signUp(email, password, fullName);
@@ -133,18 +150,21 @@ const Auth = () => {
         <Card className="w-full max-w-md mx-auto shadow-large">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">
-              {isLogin ? 'Welcome Back' : 'Create Account'}
+              {isForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome Back' : 'Create Account')}
             </CardTitle>
             <CardDescription>
-              {isLogin 
-                ? 'Sign in to your account to continue' 
-                : 'Sign up to start managing your garment orders'
+              {isForgotPassword 
+                ? 'Enter your email to receive reset instructions'
+                : (isLogin 
+                  ? 'Sign in to your account to continue' 
+                  : 'Sign up to start managing your garment orders'
+                )
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
+              {!isLogin && !isForgotPassword && (
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input
@@ -172,18 +192,32 @@ const Auth = () => {
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+              {!isForgotPassword && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setIsForgotPassword(true)}
+                        className="text-sm text-primary hover:underline"
+                        disabled={isLoading}
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
@@ -193,10 +227,10 @@ const Auth = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isLogin ? 'Signing In...' : 'Creating Account...'}
+                    {isForgotPassword ? 'Sending Reset Email...' : (isLogin ? 'Signing In...' : 'Creating Account...')}
                   </>
                 ) : (
-                  isLogin ? 'Sign In' : 'Create Account'
+                  isForgotPassword ? 'Send Reset Email' : (isLogin ? 'Sign In' : 'Create Account')
                 )}
               </Button>
             </form>
@@ -204,22 +238,41 @@ const Auth = () => {
             <Separator className="my-6" />
 
             <div className="text-center">
-              <p className="text-muted-foreground text-sm">
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setEmail('');
-                    setPassword('');
-                    setFullName('');
-                  }}
-                  className="text-primary hover:underline font-medium"
-                  disabled={isLoading}
-                >
-                  {isLogin ? 'Sign up' : 'Sign in'}
-                </button>
-              </p>
+              {isForgotPassword ? (
+                <p className="text-muted-foreground text-sm">
+                  Remember your password? 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPassword(false);
+                      setIsLogin(true);
+                      setEmail('');
+                    }}
+                    className="text-primary hover:underline font-medium ml-1"
+                    disabled={isLoading}
+                  >
+                    Sign in
+                  </button>
+                </p>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {isLogin ? "Don't have an account? " : "Already have an account? "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setIsForgotPassword(false);
+                      setEmail('');
+                      setPassword('');
+                      setFullName('');
+                    }}
+                    className="text-primary hover:underline font-medium"
+                    disabled={isLoading}
+                  >
+                    {isLogin ? 'Sign up' : 'Sign in'}
+                  </button>
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
