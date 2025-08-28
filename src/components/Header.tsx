@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Bell, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,9 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
+  const { unreadCount } = useNotifications();
+  const [showNotifications, setShowNotifications] = useState(false);
+  
   return (
     <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50 shadow-soft">
       <div className="container mx-auto px-4 py-4">
@@ -28,12 +34,23 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full text-[10px] text-white flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            <div className="relative">
+              <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-4 w-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full text-[10px] text-white flex items-center justify-center font-medium">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 p-0">
+                  <NotificationDropdown onClose={() => setShowNotifications(false)} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

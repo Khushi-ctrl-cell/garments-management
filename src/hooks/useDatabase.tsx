@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { useNotifications } from './useNotifications';
 
 export interface Task {
   id: string;
@@ -161,8 +162,10 @@ export function useTasks() {
 export function useOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -200,6 +203,14 @@ export function useOrders() {
       if (error) throw error;
       
       setOrders(prev => [data as Order, ...prev]);
+      
+      // Add notification for new order
+      addNotification({
+        type: "success",
+        title: "New Order Created",
+        message: `Order ${data.order_number} has been created successfully.`,
+      });
+      
       toast({
         title: "Order created",
         description: "Your order has been created successfully.",
@@ -215,14 +226,73 @@ export function useOrders() {
     }
   };
 
+  const updateOrder = async (id: string, updates: Partial<Order>) => {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const oldOrder = orders.find(o => o.id === id);
+      setOrders(prev => prev.map(order => order.id === id ? data as Order : order));
+      
+      // Add notification for status change
+      if (updates.status && oldOrder?.status !== updates.status) {
+        const statusMessages = {
+          'pending': 'Order is now pending',
+          'in_progress': 'Order is now being processed',
+          'completed': 'Order has been completed',
+          'cancelled': 'Order has been cancelled',
+        };
+        
+        addNotification({
+          type: updates.status === 'completed' ? "success" : "info",
+          title: "Order Status Updated",
+          message: `Order ${data.order_number}: ${statusMessages[updates.status as keyof typeof statusMessages]}`,
+        });
+      }
+      
+      toast({
+        title: "Order updated",
+        description: "Order has been updated successfully.",
+      });
+      return data;
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update order. Please try again.",
+      });
+    }
+  };
+
+  const filteredOrders = orders.filter(order => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      order.order_number.toLowerCase().includes(query) ||
+      order.description?.toLowerCase().includes(query) ||
+      order.status.toLowerCase().includes(query) ||
+      new Date(order.created_at).toLocaleDateString().includes(query)
+    );
+  });
+
   useEffect(() => {
     fetchOrders();
   }, [user]);
 
   return {
-    orders,
+    orders: filteredOrders,
     loading,
+    searchQuery,
+    setSearchQuery,
     addOrder,
+    updateOrder,
     refetch: fetchOrders,
   };
 }
