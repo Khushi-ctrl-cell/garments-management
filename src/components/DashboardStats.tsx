@@ -1,6 +1,7 @@
 import { useTasks, useOrders } from "@/hooks/useDatabase";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { formatINR } from "@/lib/utils";
 
 export const DashboardStats = () => {
   const { tasks } = useTasks();
@@ -16,7 +17,7 @@ export const DashboardStats = () => {
   const stats = [
     {
       title: "Total Sales",
-      value: `₹${totalRevenue.toLocaleString()}`,
+      value: formatINR(totalRevenue),
       change: `${completedOrders} orders`,
       changeType: "neutral" as const,
       icon: DollarSign,

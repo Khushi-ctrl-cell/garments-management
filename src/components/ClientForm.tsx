@@ -19,6 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Building2, Mail, Phone, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useOrders, useClients } from "@/hooks/useDatabase";
+import { formatINR } from "@/lib/utils";
 
 interface ClientFormProps {
   open: boolean;
@@ -34,6 +36,8 @@ interface OrderItem {
 
 export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
   const { toast } = useToast();
+  const { addOrder } = useOrders();
+  const { addClient } = useClients();
   const [formData, setFormData] = useState({
     clientName: "",
     companyName: "",
@@ -70,31 +74,56 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
 
   const totalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically send the data to your backend
-    console.log("Order submitted:", { ...formData, orderItems, totalAmount });
-    
-    toast({
-      title: "Order Created",
-      description: `Order for ${formData.clientName} has been successfully created.`,
-    });
-
-    // Reset form
-    setFormData({
-      clientName: "",
-      companyName: "",
-      email: "",
-      phone: "",
-      address: "",
-      orderType: "",
-      priority: "medium",
-      notes: "",
-      expectedDelivery: "",
-    });
-    setOrderItems([]);
-    onOpenChange(false);
+    try {
+      // First, create or find client
+      const clientData = {
+        name: formData.clientName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+      };
+      
+      const client = await addClient(clientData);
+      
+      // Then create the order
+      const orderData = {
+        order_number: `ORD-${Date.now()}`,
+        description: `${formData.orderType} - ${formData.notes}`,
+        quantity: orderItems.reduce((sum, item) => sum + item.quantity, 0),
+        status: 'pending' as const,
+        priority: formData.priority as 'low' | 'medium' | 'high',
+        client_id: client?.id,
+        due_date: formData.expectedDelivery || null,
+        total_amount: totalAmount,
+      };
+      
+      await addOrder(orderData);
+      
+      // Reset form
+      setFormData({
+        clientName: "",
+        companyName: "",
+        email: "",
+        phone: "",
+        address: "",
+        orderType: "",
+        priority: "medium",
+        notes: "",
+        expectedDelivery: "",
+      });
+      setOrderItems([]);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create order. Please try again.",
+      });
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -243,14 +272,14 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
                 value={newItem.quantity}
                 onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 1})}
               />
-              <Input
-                type="number"
-                placeholder="Unit Price"
-                min="0"
-                step="0.01"
-                value={newItem.price}
-                onChange={(e) => setNewItem({...newItem, price: parseFloat(e.target.value) || 0})}
-              />
+                <Input
+                  type="number"
+                  placeholder="Unit Price (₹)"
+                  min="0"
+                  step="0.01"
+                  value={newItem.price}
+                  onChange={(e) => setNewItem({...newItem, price: parseFloat(e.target.value) || 0})}
+                />
               <Button type="button" onClick={addOrderItem} className="gradient-primary text-white">
                 <Plus className="h-4 w-4 mr-1" />
                 Add Item
@@ -270,8 +299,8 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
                   <div key={item.id} className="grid grid-cols-5 gap-2 items-center text-sm">
                     <span>{item.product}</span>
                     <span>{item.quantity}</span>
-                    <span>${item.price.toFixed(2)}</span>
-                    <span className="font-medium">${(item.quantity * item.price).toFixed(2)}</span>
+                    <span>{formatINR(item.price)}</span>
+                    <span className="font-medium">{formatINR(item.quantity * item.price)}</span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -284,7 +313,7 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
                   </div>
                 ))}
                 <div className="border-t pt-2 text-right">
-                  <span className="text-lg font-semibold">Total: ${totalAmount.toFixed(2)}</span>
+                  <span className="text-lg font-semibold">Total: {formatINR(totalAmount)}</span>
                 </div>
               </div>
             )}
@@ -313,7 +342,7 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
               <span className="font-medium">{orderItems.length}</span>
             </div>
             <div className="text-xl font-bold text-primary">
-              Total: ${totalAmount.toFixed(2)}
+              Total: {formatINR(totalAmount)}
             </div>
           </div>
 

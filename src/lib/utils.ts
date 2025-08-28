@@ -4,3 +4,18 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+// Currency conversion utilities
+const USD_TO_INR_RATE = 83;
+
+export function usdToInr(usdAmount: number): number {
+  return usdAmount * USD_TO_INR_RATE;
+}
+
+export function formatINR(amount: number): string {
+  return `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+}
+
+export function formatINRFromUSD(usdAmount: number): string {
+  return formatINR(usdToInr(usdAmount));
+}

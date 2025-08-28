@@ -6,10 +6,11 @@ import { TaskManager } from "@/components/TaskManager";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { ClientForm } from "@/components/ClientForm";
 import { NotificationPanel } from "@/components/NotificationPanel";
+import { NewOrdersPanel } from "@/components/NewOrdersPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, BarChart3, Users, ClipboardList } from "lucide-react";
+import { Plus, BarChart3, Users, ClipboardList, ShoppingCart } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -36,7 +37,7 @@ const Index = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-card border shadow-soft">
+            <TabsList className="grid w-full grid-cols-5 bg-card border shadow-soft">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -44,6 +45,10 @@ const Index = () => {
               <TabsTrigger value="tasks" className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Tasks
+              </TabsTrigger>
+              <TabsTrigger value="new-orders" className="flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                New Orders
               </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -67,6 +72,10 @@ const Index = () => {
 
                 <TabsContent value="tasks" className="mt-0">
                   <TaskManager expanded />
+                </TabsContent>
+
+                <TabsContent value="new-orders" className="mt-0">
+                  <NewOrdersPanel />
                 </TabsContent>
 
                 <TabsContent value="analytics" className="mt-0">
