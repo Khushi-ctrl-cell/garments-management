@@ -16,14 +16,15 @@ export function formatINR(amount: number): string {
   return `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 }
 
+export function formatINRFromUSD(usdAmount: number): string {
+  return formatINR(usdToInr(usdAmount));
+}
+
+// GST calculation utility
 export function calculateGST(amount: number): { subtotal: number; gst: number; total: number } {
   const subtotal = amount;
   const gst = subtotal * 0.05; // 5% GST
   const total = subtotal + gst;
   
   return { subtotal, gst, total };
-}
-
-export function formatINRFromUSD(usdAmount: number): string {
-  return formatINR(usdToInr(usdAmount));
 }
