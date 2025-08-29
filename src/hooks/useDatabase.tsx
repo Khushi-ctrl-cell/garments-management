@@ -17,6 +17,18 @@ export interface Task {
   updated_at: string;
 }
 
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  user_id: string;
+  item_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Order {
   id: string;
   order_number: string;
@@ -27,6 +39,11 @@ export interface Order {
   client_id?: string;
   due_date?: string;
   total_amount?: number;
+  subtotal_amount?: number;
+  gst_amount?: number;
+  creator_name?: string;
+  creator_phone?: string;
+  photo_urls?: string[];
   created_at: string;
   updated_at: string;
 }

@@ -47,17 +47,66 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_name: string
+          order_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_name: string
+          order_id: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_name?: string
+          order_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           client_id: string | null
           created_at: string
+          creator_name: string | null
+          creator_phone: string | null
           description: string | null
           due_date: string | null
+          gst_amount: number | null
           id: string
           order_number: string
+          photo_urls: string[] | null
           priority: string | null
           quantity: number | null
           status: string | null
+          subtotal_amount: number | null
           total_amount: number | null
           updated_at: string
           user_id: string
@@ -65,13 +114,18 @@ export type Database = {
         Insert: {
           client_id?: string | null
           created_at?: string
+          creator_name?: string | null
+          creator_phone?: string | null
           description?: string | null
           due_date?: string | null
+          gst_amount?: number | null
           id?: string
           order_number: string
+          photo_urls?: string[] | null
           priority?: string | null
           quantity?: number | null
           status?: string | null
+          subtotal_amount?: number | null
           total_amount?: number | null
           updated_at?: string
           user_id: string
@@ -79,13 +133,18 @@ export type Database = {
         Update: {
           client_id?: string | null
           created_at?: string
+          creator_name?: string | null
+          creator_phone?: string | null
           description?: string | null
           due_date?: string | null
+          gst_amount?: number | null
           id?: string
           order_number?: string
+          photo_urls?: string[] | null
           priority?: string | null
           quantity?: number | null
           status?: string | null
+          subtotal_amount?: number | null
           total_amount?: number | null
           updated_at?: string
           user_id?: string

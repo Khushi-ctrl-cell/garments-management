@@ -17,10 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Building2, Mail, Phone, DollarSign } from "lucide-react";
+import { Plus, X, Building2, Mail, Phone, DollarSign, Camera, Upload, User, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useOrders, useClients } from "@/hooks/useDatabase";
-import { formatINR } from "@/lib/utils";
+import { formatINR, calculateGST } from "@/lib/utils";
+import { PhotoUpload } from "./PhotoUpload";
 
 interface ClientFormProps {
   open: boolean;
@@ -48,7 +49,12 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
     priority: "medium",
     notes: "",
     expectedDelivery: "",
+    creatorName: "",
+    creatorPhone: "",
   });
+
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [newItem, setNewItem] = useState({
@@ -72,7 +78,8 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
     setOrderItems(orderItems.filter(item => item.id !== id));
   };
 
-  const totalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  const subtotalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  const { subtotal, gst, total } = calculateGST(subtotalAmount);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +104,12 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
         priority: formData.priority as 'low' | 'medium' | 'high',
         client_id: client?.id,
         due_date: formData.expectedDelivery || null,
-        total_amount: totalAmount,
+        subtotal_amount: subtotal,
+        gst_amount: gst,
+        total_amount: total,
+        creator_name: formData.creatorName,
+        creator_phone: formData.creatorPhone,
+        photo_urls: photoUrls,
       };
       
       await addOrder(orderData);
@@ -113,8 +125,11 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
         priority: "medium",
         notes: "",
         expectedDelivery: "",
+        creatorName: "",
+        creatorPhone: "",
       });
       setOrderItems([]);
+      setPhotoUrls([]);
       onOpenChange(false);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -255,6 +270,50 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
             </div>
           </div>
 
+          {/* Creator Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
+            <h3 className="col-span-full text-lg font-medium mb-2 flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Order Creator Information
+            </h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="creatorName">Your Name *</Label>
+              <Input
+                id="creatorName"
+                value={formData.creatorName}
+                onChange={(e) => setFormData({...formData, creatorName: e.target.value})}
+                required
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="creatorPhone">Your Phone *</Label>
+              <Input
+                id="creatorPhone"
+                value={formData.creatorPhone}
+                onChange={(e) => setFormData({...formData, creatorPhone: e.target.value})}
+                required
+                placeholder="+91 98765 43210"
+              />
+            </div>
+          </div>
+
+          {/* Photo Upload */}
+          <div className="p-4 border rounded-lg">
+            <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Order Documents/Photos
+            </h3>
+            <PhotoUpload
+              photoUrls={photoUrls}
+              onPhotosChange={setPhotoUrls}
+              uploading={uploadingPhoto}
+              onUploadingChange={setUploadingPhoto}
+            />
+          </div>
+
           {/* Order Items */}
           <div className="p-4 border rounded-lg">
             <h3 className="text-lg font-medium mb-4">Order Items</h3>
@@ -312,8 +371,19 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
                     </Button>
                   </div>
                 ))}
-                <div className="border-t pt-2 text-right">
-                  <span className="text-lg font-semibold">Total: {formatINR(totalAmount)}</span>
+                <div className="border-t pt-2 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal:</span>
+                    <span>{formatINR(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>GST (5%):</span>
+                    <span>{formatINR(gst)}</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-semibold border-t pt-2">
+                    <span>Total:</span>
+                    <span>{formatINR(total)}</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -342,7 +412,7 @@ export const ClientForm = ({ open, onOpenChange }: ClientFormProps) => {
               <span className="font-medium">{orderItems.length}</span>
             </div>
             <div className="text-xl font-bold text-primary">
-              Total: {formatINR(totalAmount)}
+              Total: {formatINR(total)}
             </div>
           </div>
 
