@@ -88,8 +88,17 @@ export function useTasks() {
   };
 
   const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found - not authenticated');
+      toast({
+        variant: "destructive",
+        title: "Authentication required",
+        description: "Please sign in to add tasks.",
+      });
+      return;
+    }
 
+    console.log('Attempting to add task:', task, 'User ID:', user.id);
     try {
       const { data, error } = await supabase
         .from('tasks')
