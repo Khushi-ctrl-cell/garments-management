@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { DashboardStats } from "@/components/DashboardStats";
 import { TaskManager } from "@/components/TaskManager";
 import { PerformanceChart } from "@/components/PerformanceChart";
+import { AnalyticsChart } from "@/components/AnalyticsChart";
 import { ClientForm } from "@/components/ClientForm";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { NewOrdersPanel } from "@/components/NewOrdersPanel";
@@ -81,7 +82,7 @@ const Index = () => {
                   </TabsContent>
 
                   <TabsContent value="analytics" className="mt-0">
-                    <PerformanceChart expanded />
+                    <AnalyticsChart expanded />
                   </TabsContent>
 
                   <TabsContent value="clients" className="mt-0">

@@ -297,6 +297,38 @@ export function useOrders() {
     }
   };
 
+  const deleteOrder = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      const deletedOrder = orders.find(o => o.id === id);
+      setOrders(prev => prev.filter(order => order.id !== id));
+      
+      addNotification({
+        type: "info",
+        title: "Order Deleted",
+        message: `Order ${deletedOrder?.order_number || ''} has been deleted.`,
+      });
+      
+      toast({
+        title: "Order deleted",
+        description: "Order has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete order. Please try again.",
+      });
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -319,6 +351,7 @@ export function useOrders() {
     setSearchQuery,
     addOrder,
     updateOrder,
+    deleteOrder,
     refetch: fetchOrders,
   };
 }

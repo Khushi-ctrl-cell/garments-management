@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Package, DollarSign, Clock, Edit2, Save, X, User, Phone, FileImage } from "lucide-react";
+import { Calendar, Package, DollarSign, Clock, Edit2, Save, X, User, Phone, FileImage, Trash2 } from "lucide-react";
 import { Order } from "@/hooks/useDatabase";
 import { formatINR } from "@/lib/utils";
 import { format } from "date-fns";
@@ -17,9 +17,10 @@ interface OrderDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
+  onDeleteOrder?: (orderId: string) => void;
 }
 
-export const OrderDetailDialog = ({ order, open, onOpenChange, onUpdateOrder }: OrderDetailDialogProps) => {
+export const OrderDetailDialog = ({ order, open, onOpenChange, onUpdateOrder, onDeleteOrder }: OrderDetailDialogProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedOrder, setEditedOrder] = useState<Partial<Order>>({});
   const [loading, setLoading] = useState(false);
@@ -90,12 +91,28 @@ export const OrderDetailDialog = ({ order, open, onOpenChange, onUpdateOrder }: 
               <Package className="h-5 w-5" />
               Order Details
             </DialogTitle>
-            {canEdit && !isEditing && (
-              <Button variant="outline" size="sm" onClick={handleEdit}>
-                <Edit2 className="h-4 w-4 mr-1" />
-                Edit
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {canEdit && !isEditing && (
+                <Button variant="outline" size="sm" onClick={handleEdit}>
+                  <Edit2 className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              )}
+              {onDeleteOrder && order.status === 'pending' && !isEditing && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => {
+                    onDeleteOrder(order.id);
+                    onOpenChange(false);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
 

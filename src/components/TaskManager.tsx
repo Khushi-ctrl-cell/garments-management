@@ -22,6 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TaskEditDialog } from "./TaskEditDialog";
+import { ConfirmationDialog } from "./ConfirmationDialog";
+import type { Task } from "@/hooks/useDatabase";
 
 interface TaskManagerProps {
   expanded?: boolean;
@@ -30,6 +33,10 @@ interface TaskManagerProps {
 export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
   const { tasks, loading, addTask, updateTask, deleteTask } = useTasks();
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -71,8 +78,26 @@ export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
     }
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    await deleteTask(taskId);
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+    await updateTask(taskId, updates);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setDeletingTaskId(taskId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteTask = async () => {
+    if (deletingTaskId) {
+      await deleteTask(deletingTaskId);
+      setDeletingTaskId(null);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -240,7 +265,12 @@ export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-1 ml-2">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-7 w-7 p-0"
+                          onClick={() => handleEditTask(task)}
+                        >
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button 
@@ -267,6 +297,23 @@ export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
           )}
         </div>
       </CardContent>
+      
+      <TaskEditDialog
+        task={editingTask}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onUpdateTask={handleUpdateTask}
+      />
+      
+      <ConfirmationDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={confirmDeleteTask}
+        title="Delete Task"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+      />
     </Card>
   );
 };

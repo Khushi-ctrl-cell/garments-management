@@ -4,16 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Clock, Package, DollarSign, Search, Eye } from "lucide-react";
+import { Clock, Package, DollarSign, Search, Eye, Trash2 } from "lucide-react";
 import { formatINR } from "@/lib/utils";
 import { format } from "date-fns";
 import { OrderDetailDialog } from "./OrderDetailDialog";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 import type { Order } from "@/hooks/useDatabase";
 
 export const NewOrdersPanel = () => {
-  const { orders, loading, searchQuery, setSearchQuery, updateOrder } = useOrders();
+  const { orders, loading, searchQuery, setSearchQuery, updateOrder, deleteOrder } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetail, setShowOrderDetail] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const recentOrders = orders.slice(0, 10); // Show last 10 orders
 
@@ -58,6 +61,24 @@ export const NewOrdersPanel = () => {
       const updatedOrder = orders.find(o => o.id === orderId);
       if (updatedOrder) {
         setSelectedOrder(updatedOrder);
+      }
+    }
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    setDeletingOrderId(orderId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteOrder = async () => {
+    if (deletingOrderId) {
+      await deleteOrder(deletingOrderId);
+      setDeletingOrderId(null);
+      setShowDeleteConfirm(false);
+      // Close order detail if it was the deleted order
+      if (selectedOrder && selectedOrder.id === deletingOrderId) {
+        setShowOrderDetail(false);
+        setSelectedOrder(null);
       }
     }
   };
@@ -156,9 +177,24 @@ export const NewOrdersPanel = () => {
                     </div>
                   </div>
                   
-                  <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {order.status === 'pending' && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-destructive hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteOrder(order.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
               
@@ -179,6 +215,17 @@ export const NewOrdersPanel = () => {
         open={showOrderDetail}
         onOpenChange={setShowOrderDetail}
         onUpdateOrder={handleUpdateOrder}
+        onDeleteOrder={handleDeleteOrder}
+      />
+      
+      <ConfirmationDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={confirmDeleteOrder}
+        title="Delete Order"
+        description="Are you sure you want to delete this order? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
       />
     </>
   );
