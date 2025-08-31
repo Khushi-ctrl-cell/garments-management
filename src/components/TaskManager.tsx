@@ -61,20 +61,34 @@ export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
     await updateTask(taskId, { status: newStatus });
   };
 
+  const [isSubmittingTask, setIsSubmittingTask] = useState(false);
+
   const handleAddTask = async () => {
-    if (newTask.title.trim()) {
-      await addTask({
+    if (!newTask.title.trim()) {
+      return;
+    }
+    
+    setIsSubmittingTask(true);
+    try {
+      const result = await addTask({
         ...newTask,
         status: 'todo',
       });
-      setNewTask({
-        title: "",
-        description: "",
-        priority: "medium",
-        assignee_id: "",
-        due_date: "",
-      });
-      setIsAddingTask(false);
+      
+      if (result) {
+        setNewTask({
+          title: "",
+          description: "",
+          priority: "medium",
+          assignee_id: "",
+          due_date: "",
+        });
+        setIsAddingTask(false);
+      }
+    } catch (error) {
+      console.error('Error creating task:', error);
+    } finally {
+      setIsSubmittingTask(false);
     }
   };
 
@@ -203,8 +217,12 @@ export const TaskManager = ({ expanded = false }: TaskManagerProps) => {
                     onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
                   />
                 </div>
-                <Button onClick={handleAddTask} className="w-full gradient-primary text-white">
-                  Add Task
+                <Button 
+                  onClick={handleAddTask} 
+                  className="w-full gradient-primary text-white"
+                  disabled={!newTask.title.trim() || isSubmittingTask}
+                >
+                  {isSubmittingTask ? "Adding Task..." : "Add Task"}
                 </Button>
               </div>
             </DialogContent>
