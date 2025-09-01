@@ -1,54 +1,60 @@
-# Welcome to your Lovable project
+# 👗 Garments Management
 
-## Project info
+A modern, TypeScript-based web application for managing garments and inventory. Built with React, Tailwind CSS, Vite, and shadcn-ui, offering a sleek, responsive user experience.
 
-**URL**: https://lovable.dev/projects/ca38e192-734a-48e7-9a27-b145c4b58fce
+---
 
-## How can I edit this code?
+##  Project Overview
 
-There are several ways of editing your application.
+**Garments Management** enables users to efficiently manage garment inventory—track quantities, view details, and keep data organized in a dynamic, intuitive interface.
 
-**Use Lovable**
+- **Built with:** Vite, TypeScript, React, shadcn-ui, Tailwind CSS
+- **Features:** Inventory dashboard, garment listings, search & filter, responsive UI
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ca38e192-734a-48e7-9a27-b145c4b58fce) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+##  Table of Contents
 
-**Use your preferred IDE**
+- [Features](#-features)  
+- [Tech Stack](#-tech-stack)  
+- [Screenshots](#-screenshots)  
+- [Installation](#-installation)  
+- [Usage](#-usage)  
+- [Configuration](#-configuration)  
+- [Deployment](#-deployment)  
+- [Contributing](#-contributing)  
+- [License](#-license)  
+- [Credits](#-credits)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+##  Features
 
-Follow these steps:
+- **Inventory Dashboard** – Get an overview of stock levels at a glance.  
+- **Garment Listing** – Browse items with images, names, IDs, quantities, and details.  
+- **Search & Filter** – Quickly locate garments by category or keyword.  
+- **Responsive UI** – Clean design optimized for both desktop and mobile.  
+- **Modular Components** – Built with reusable shadcn-ui components for easy extension.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+##  Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Frontend:** React with TypeScript  
+- **Build Tool:** Vite  
+- **UI Framework:** Tailwind CSS, shadcn-ui  
+- **Styling:** Component-based, utility-first approach  
+- **Data Layer:** (Add if applicable) e.g., Supabase, REST API, local state
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+##  Installation
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+git clone https://github.com/Khushi-ctrl-cell/garments-management.git
+cd garments-management
+npm install
 
 ## What technologies are used for this project?
 
@@ -60,14 +66,3 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/ca38e192-734a-48e7-9a27-b145c4b58fce) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
